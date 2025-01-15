@@ -1,0 +1,28 @@
+{
+  "configurations": [
+    {
+      "type": "coreclr",
+      "request": "launch",
+      "name": "Launch CaddyBrowseDeleter",
+      "program": "${workspaceFolder}/src/CaddyBrowseDeleter/bin/Debug/net8.0/CaddyBrowseDeleter.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/CaddyBrowseDeleter",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "preLaunchTask": "build"
+    }
+  ],
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "programPath",
+      "description": "Path to your program"
+    }
+  ]
+}

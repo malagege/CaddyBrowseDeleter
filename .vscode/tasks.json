@@ -1,0 +1,14 @@
+{
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/src/CaddyBrowseDeleter/CaddyBrowseDeleter.csproj"
+      ],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}
