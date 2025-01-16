@@ -20,15 +20,23 @@ public class ToDoDeleteFileController : ControllerBase
 
     // GET: api/ToDoDeleteFile
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ToDoDeleteFile>>> GetToDoDeleteFiles()
+    public async Task<ActionResult<IEnumerable<ToDoDeleteFile>>> GetToDoDeleteFiles(string? filepath)
     {
-        return await _context.ToDoDeleteFiles.ToListAsync();
+        if (filepath != null)
+        {
+            return await _context.ToDoDeleteFiles
+            .Include(x => x.User)
+            .Where(x => x.FilePath == filepath).ToListAsync();
+        }
+        return await _context.ToDoDeleteFiles.Include(x => x.User).ToListAsync();
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ToDoDeleteFile>> GetToDoDeleteFile(long id)
     {
-        var toDoDeleteFile = await _context.ToDoDeleteFiles.FindAsync(id);
+        var toDoDeleteFile = await _context.ToDoDeleteFiles
+                                        .Include(x => x.User)
+                                        .FirstOrDefaultAsync(x => x.Id == id);
 
         if (toDoDeleteFile == null)
         {
