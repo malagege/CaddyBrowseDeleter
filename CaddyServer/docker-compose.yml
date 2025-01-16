@@ -1,0 +1,12 @@
+version: '3'
+services:
+  caddy:
+    image: caddy #arm32v6/caddy
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "80:80"
+    volumes:
+      - ./extHDD/:/srv
+      - ./Caddyfile:/etc/caddy/Caddyfile
