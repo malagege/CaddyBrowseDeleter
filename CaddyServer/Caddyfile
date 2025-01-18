@@ -1,4 +1,16 @@
 http://:80
 
 root * /srv/
-file_server browse
+
+file_server {
+    browse /etc/caddy/browse.html {
+        sort time desc
+    }
+}
+
+
+handle_path "/CaddyBrowseDeleter/*" {
+    rewrite * /CaddyBrowseDeleter{path}
+    reverse_proxy host.docker.internal:5050
+}
+
