@@ -25,13 +25,6 @@ public class ToDoDeleteFile
     /// </summary>
     public string DirPath { get; set; }
     
-    /// <summary>
-    /// 關聯的使用者。
-    /// </summary>
-    public User User { get; set; }
-    
-    /// <summary>
-    /// 使用者的唯一識別碼。
-    /// </summary>
-    public long UserId { get; set; }
+    // 多對多關係
+    public ICollection<User> Users { get; set; }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Data;
 using Microsoft.EntityFrameworkCore;
+using CaddyBrowseDeleter.ViewModel;
 
 namespace CaddyBrowseDeleter.Controllers;
 
@@ -19,55 +20,55 @@ public class ToDoDeleteFileController : ControllerBase
     }
 
     // GET: api/ToDoDeleteFile
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<ToDoDeleteFile>>> GetToDoDeleteFiles(string? filepath)
+    [HttpGet("{*path}")]
+    public async Task<ActionResult<IEnumerable<ToDoDeleteFile>>> GetToDoDeleteFiles(string? dirpath)
     {
-        if (filepath != null)
+        if (dirpath != null)
         {
             return await _context.ToDoDeleteFiles
-            .Include(x => x.User)
-            .Where(x => x.FilePath == filepath).ToListAsync();
+            .Include(x => x.Users)
+            .Where(x => x.DirPath == dirpath).ToListAsync();
         }
-        return await _context.ToDoDeleteFiles.Include(x => x.User).ToListAsync();
+        return await _context.ToDoDeleteFiles.Include(x => x.Users).ToListAsync();
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<ToDoDeleteFile>> GetToDoDeleteFile(long id)
-    {
-        var toDoDeleteFile = await _context.ToDoDeleteFiles
-                                        .Include(x => x.User)
-                                        .FirstOrDefaultAsync(x => x.Id == id);
 
-        if (toDoDeleteFile == null)
-        {
-            return NotFound();
-        }
-
-        return toDoDeleteFile;
-    }
 
     // POST: api/ToDoDeleteFile
     [HttpPost]
-    public async Task<ActionResult<ToDoDeleteFile>> PostToDoDeleteFile(ToDoDeleteFile toDoDeleteFile)
+    public async Task<ActionResult<ToDoDeleteFile>> PostToDoDeleteFile(DoDeleteFileViewModel viewModel)
     {
-        _context.ToDoDeleteFiles.Add(toDoDeleteFile);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetToDoDeleteFiles), new { id = toDoDeleteFile.Id }, toDoDeleteFile);
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteToDoDeleteFile(long id)
-    {
-        var toDoDeleteFile = await _context.ToDoDeleteFiles.FindAsync(id);
-        if (toDoDeleteFile == null)
+        // 查出使用者
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Name == viewModel.UserName);
+        if (user == null)
         {
-            return NotFound();
+            return BadRequest("使用者不存在");
+        }
+        // 查看是否有刪除檔案
+        var toDoDeleteFile = await _context.ToDoDeleteFiles.FirstOrDefaultAsync(x => x.FilePath == viewModel.FilePath);
+        // 有檔案代表要取消刪除要求
+        if (toDoDeleteFile != null && toDoDeleteFile.Users.Contains(user))
+        {
+            _context.ToDoDeleteFiles.Remove(toDoDeleteFile);
+            return NoContent();
+        }
+        else if (toDoDeleteFile != null)
+        {
+            toDoDeleteFile.Users.Add(user);
+        }
+        else
+        {
+            toDoDeleteFile = new ToDoDeleteFile
+            {
+                FilePath = viewModel.FilePath,
+                Users = new List<User> { user }
+            };
+            _context.ToDoDeleteFiles.Add(toDoDeleteFile);
         }
 
-        _context.ToDoDeleteFiles.Remove(toDoDeleteFile);
         await _context.SaveChangesAsync();
-
-        return NoContent();
+        return Ok();
     }
+
+
 }
