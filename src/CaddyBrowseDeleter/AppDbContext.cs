@@ -17,4 +17,14 @@ public class AppDbContext : DbContext
     {
         optionsBuilder.UseSqlite("Data Source=app.db");
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<User>().HasData(
+            new User { Id = 1, Name = "malagege"},
+            new User { Id = 2, Name = "chevy"}
+        );
+    }
 }
