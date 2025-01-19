@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 
 namespace CaddyBrowseDeleter
@@ -29,11 +28,11 @@ namespace CaddyBrowseDeleter
             }
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
+            // if (app.Environment.IsDevelopment())
+            // {
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
+            // }
 
             // app.UseHttpsRedirection();
 
