@@ -1,7 +1,7 @@
 {{ $nonce := uuidv4 -}}
 {{ $nonceAttribute := print "nonce=" (quote $nonce) -}}
 {{ $csp := printf "default-src 'none'; img-src 'self'; object-src 'none'; base-uri 'none'; script-src 'nonce-%s'; style-src 'nonce-%s'; frame-ancestors 'self'; form-action 'self';" $nonce $nonce -}}
-{{/* To disable the Content-Security-Policy, set this to false */}}{{ $enableCsp := true -}}
+{{/* To disable the Content-Security-Policy, set this to false */}}{{ $enableCsp := false -}}
 {{ if $enableCsp -}}
   {{- .RespHeader.Set "Content-Security-Policy" $csp -}}
 {{ end -}}
@@ -1179,10 +1179,14 @@ footer {
 					openDialog(filename);
 				});
 			});
-			
+			var passwordPromptDialog = document.getElementById('passwordDialog');
 			// password dialog
 			document.getElementById('passwordDialog').addEventListener('close', function() {
-				document.getElementById('password').value = '';
+				if( passwordPromptDialog.returnValue) {
+					const password = passwordPromptDialog.returnValue;
+					const filePath = document.getElementById('filePath').textContent;
+					sendPassword(filePath, password);
+				}
 			});
 
 			function queryParam(k, v) {
@@ -1222,31 +1226,30 @@ footer {
 				console.log("當前參照路徑 URL: " + currentPath);
 				document.getElementById('filePath').textContent = currentPath + filename;
 
-				const dialog = document.getElementById('passwordDialog');
-				dialog.showModal();
+				passwordPromptDialog.showModal();
 
 				const confirmButton = document.getElementById('confirmButton');
 				confirmButton.onclick = function() {
 					const password = document.getElementById('password').value;
-					sendPassword(filePath, password);
-					dialog.close();
+					passwordPromptDialog.close(password);
 				};
 
 				const cancelButton = document.getElementById('cancelButton');
 				cancelButton.onclick = function() {
-					dialog.close();
+					passwordPromptDialog.close();
 				};
 			}
 
-			function sendPassword(filePath, password) {
-				fetch('/api/your-endpoint', {
+			function sendPassword(filePath, userName) {
+				fetch('/api/ToDoDeleteFile', {
 					method: 'POST',
 					headers: {
+						'accept': 'text/plain',
 						'Content-Type': 'application/json'
 					},
 					body: JSON.stringify({
-						path: filePath,
-						password: password
+						filePath: filePath,
+						userName: userName
 					})
 				})
 				.then(response => response.json())
