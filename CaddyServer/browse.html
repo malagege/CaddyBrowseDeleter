@@ -311,7 +311,7 @@
 		<meta name="color-scheme" content="light dark">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style {{ $nonceAttribute }}>
-* { padding: 0; margin: 0; box-sizing: border-box; }
+/* * { padding: 0; margin: 0; box-sizing: border-box; } */
 
 body {
 	font-family: Inter, system-ui, sans-serif;
@@ -947,6 +947,7 @@ footer {
 							{{- end}}
 						</th>
 						<th class="hideable"></th>
+						<th>操作</th>
 					</tr>
 					</thead>
 					<tbody>
@@ -965,6 +966,7 @@ footer {
 						<td></td>
 						<td class="hideable"></td>
 						<td class="hideable"></td>
+						<td></td>
 					</tr>
 					{{- end}}
 					{{- range .Items}}
@@ -1000,6 +1002,11 @@ footer {
 							<time datetime="{{.HumanModTime "2006-01-02T15:04:05Z"}}">{{.HumanModTime "01/02/2006 03:04:05 PM -07:00"}}</time>
 						</td>
 						<td class="hideable"></td>
+						<td>
+							<button class="deleteBtn" data-filename="{{.Name}}">
+								🗑️
+							</button>
+						</td>
 					</tr>
 					{{- end}}
 					</tbody>
@@ -1084,7 +1091,27 @@ footer {
 				</svg>
 			</a>
 		</footer>
-
+<!-- 新增 HTML5 對話框 -->
+<dialog id="passwordDialog">
+    <form method="dialog">
+		<div>
+			檔案路徑: <span id="filePath"></span>
+		</div>
+        <label for="password">請輸入密碼:</label>
+        <input type="password" id="password" name="password">
+        <menu>
+            <button id="cancelButton">取消</button>
+            <button id="confirmButton">確認</button>
+        </menu>
+    </form>
+</dialog>
+<dialog open>
+	<p>Greetings, one and all!</p>
+	<form method="dialog">
+	  <button>OK</button>
+	</form>
+  </dialog>
+  
 		<script {{ $nonceAttribute }}>
 			const filterEl = document.getElementById('filter');
 			filterEl?.focus({ preventScroll: true });
@@ -1145,6 +1172,19 @@ footer {
 
 			window.addEventListener("load", initPage);
 
+			// delete btn  event
+			document.querySelectorAll('.deleteBtn').forEach(function(el) {
+				el.addEventListener('click', function() {
+					const filename = el.getAttribute('data-filename');
+					openDialog(filename);
+				});
+			});
+			
+			// password dialog
+			document.getElementById('passwordDialog').addEventListener('close', function() {
+				document.getElementById('password').value = '';
+			});
+
 			function queryParam(k, v) {
 				const qs = new URLSearchParams(window.location.search);
 				if (!v) {
@@ -1175,6 +1215,48 @@ footer {
 			}
 			var timeList = Array.prototype.slice.call(document.getElementsByTagName("time"));
 			timeList.forEach(localizeDatetime);
+
+			function openDialog(filename) {
+				const currentPath = window.location.pathname;
+				console.log("檔案參照路徑: " + filename);
+				console.log("當前參照路徑 URL: " + currentPath);
+				document.getElementById('filePath').textContent = currentPath + filename;
+
+				const dialog = document.getElementById('passwordDialog');
+				dialog.showModal();
+
+				const confirmButton = document.getElementById('confirmButton');
+				confirmButton.onclick = function() {
+					const password = document.getElementById('password').value;
+					sendPassword(filePath, password);
+					dialog.close();
+				};
+
+				const cancelButton = document.getElementById('cancelButton');
+				cancelButton.onclick = function() {
+					dialog.close();
+				};
+			}
+
+			function sendPassword(filePath, password) {
+				fetch('/api/your-endpoint', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						path: filePath,
+						password: password
+					})
+				})
+				.then(response => response.json())
+				.then(data => {
+					console.log('成功:', data);
+				})
+				.catch((error) => {
+					console.error('錯誤:', error);
+				});
+			}
 		</script>
 	</body>
 </html>
