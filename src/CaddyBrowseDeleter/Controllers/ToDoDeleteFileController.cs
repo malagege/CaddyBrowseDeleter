@@ -20,16 +20,30 @@ public class ToDoDeleteFileController : ControllerBase
     }
 
     // GET: api/ToDoDeleteFile
-    [HttpGet("{*path}")]
+    [HttpGet()]
     public async Task<ActionResult<List<ToDoDeleteFile>>> GetToDoDeleteFiles(string? path)
     {
+        var allUsers = await _context.Users.ToListAsync();
+        var filesQuery =  _context.ToDoDeleteFiles
+            .Include(x => x.Users);
         if (path != null)
         {
-            return await _context.ToDoDeleteFiles
-            .Include(x => x.Users)
-            .Where(x => x.DirPath == path).ToListAsync();
+            var filteredFiles = await filesQuery
+                .Where(x => EF.Functions.Like(x.FilePath, $"{path}%")).ToListAsync();
+            // 檢查檔案是否被所有使用者確認，確認修改 IsReadyToDelete
+            foreach (var file in filteredFiles)
+            {
+                file.IsReadyToDelete = allUsers.All(x => file.Users.Contains(x));
+            }
+            return filteredFiles;
         }
-        return await _context.ToDoDeleteFiles.Include(x => x.Users).ToListAsync();
+        var files = await filesQuery.ToListAsync();
+        foreach (var file in files)
+        {
+            file.IsReadyToDelete = allUsers.All(x => file.Users.Contains(x));
+        }
+
+        return files;
     }
 
 
@@ -45,12 +59,13 @@ public class ToDoDeleteFileController : ControllerBase
             return BadRequest("使用者不存在");
         }
         // 查看是否有刪除檔案
-        var toDoDeleteFile = await _context.ToDoDeleteFiles.FirstOrDefaultAsync(x => x.FilePath == viewModel.FilePath);
+        var toDoDeleteFile = await _context.ToDoDeleteFiles
+            .Include(x => x.Users)
+            .FirstOrDefaultAsync(x => x.FilePath == viewModel.FilePath);
         // 有檔案代表要取消刪除要求
         if (toDoDeleteFile != null && toDoDeleteFile.Users.Contains(user))
         {
-            _context.ToDoDeleteFiles.Remove(toDoDeleteFile);
-            return NoContent();
+            toDoDeleteFile.Users.Remove(user);
         }
         else if (toDoDeleteFile != null)
         {
@@ -58,9 +73,15 @@ public class ToDoDeleteFileController : ControllerBase
         }
         else
         {
+            var dirpath = Path.GetDirectoryName(viewModel.FilePath)?.Replace("\\", "/");
+            if (dirpath == null)
+            {
+                return BadRequest("路徑錯誤");
+            }
             toDoDeleteFile = new ToDoDeleteFile
             {
                 FilePath = viewModel.FilePath,
+                DirPath = dirpath,
                 Users = new List<User> { user }
             };
             _context.ToDoDeleteFiles.Add(toDoDeleteFile);

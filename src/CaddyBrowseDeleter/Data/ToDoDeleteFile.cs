@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,6 +25,14 @@ public class ToDoDeleteFile
     /// 目錄的路徑。
     /// </summary>
     public string DirPath { get; set; }
+
+    /// <summary>
+    /// 是否準備刪除。
+    /// </summary>
+    /// <value></value>
+    [NotMapped]
+    public bool IsReadyToDelete { get; set; }
+
     
     // 多對多關係
     public ICollection<User> Users { get; set; }
