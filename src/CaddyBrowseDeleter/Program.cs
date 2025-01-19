@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace CaddyBrowseDeleter
@@ -12,7 +14,11 @@ namespace CaddyBrowseDeleter
             // 設定服務
             builder.Services.AddDbContext<AppDbContext>();
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
