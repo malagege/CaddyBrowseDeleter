@@ -1,0 +1,6 @@
+@CaddyBrowseDeleter_HostAddress = http://localhost:5274
+
+GET {{CaddyBrowseDeleter_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
