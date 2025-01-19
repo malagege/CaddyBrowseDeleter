@@ -11,3 +11,10 @@ services:
       - ./extHDD/:/srv
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ./browse.html:/etc/caddy/browse.html
+  caddybrowsedeleter:
+    build:
+      context: ../src/CaddyBrowseDeleter
+      dockerfile: Dockerfile
+    ports:
+      - "5050:8080"
+    restart: unless-stopped
