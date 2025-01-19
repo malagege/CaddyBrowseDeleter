@@ -1182,6 +1182,39 @@ footer {
 				}
 			});
 
+			document.addEventListener('DOMContentLoaded', function() {
+				const currentPath = encodeURIComponent(window.location.pathname);
+				fetch(`/api/ToDoDeleteFile?path=${currentPath}`, {
+					method: 'GET',
+					headers: {
+						'accept': 'text/plain'
+					}
+				})
+				.then(response => response.json())
+				.then(data => {
+					data.forEach(file => {
+						const deleteButtons = document.querySelectorAll('.deleteBtn');
+						deleteButtons.forEach(button => {
+							var filename = file.filePath.split('/').pop();
+							if (button.dataset.filename === filename) {
+
+
+								if (file.users.length > 0) {
+									button.title = file.users.map(user => user.name).join(', ');
+									button.style.backgroundColor = 'red';
+								}
+								if (file.isReadyToDelete) {
+									button.style.backgroundColor = 'green';
+								}
+							}
+						});
+					});
+				})
+				.catch((error) => {
+					console.error('錯誤:', error);
+				});
+			});
+
 			function queryParam(k, v) {
 				const qs = new URLSearchParams(window.location.search);
 				if (!v) {
