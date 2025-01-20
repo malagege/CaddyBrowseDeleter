@@ -42,8 +42,8 @@ namespace CaddyBrowseDeleter
             provider.UseScheduler(scheduler =>
             {
                 scheduler.Schedule<DeleteFilesJob>() // 每分鐘執行
-                    .EveryMinute().RunOnceAtStart();
-                    // .DailyAtHour(3).RunOnceAtStart(); // 每日半夜三點執行
+                    // .EveryMinute().RunOnceAtStart();
+                    .DailyAtHour(3); // 每日半夜三點執行
 
             });
 
