@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
-
+using Coravel;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace CaddyBrowseDeleter
 {
@@ -13,6 +15,8 @@ namespace CaddyBrowseDeleter
             // Add services to the container.
             // 設定服務
             builder.Services.AddDbContext<AppDbContext>();
+            builder.Services.AddScheduler();
+            builder.Services.AddTransient<DeleteFilesJob>();
 
             builder.Services.AddControllers()
             .AddJsonOptions(options =>
@@ -32,6 +36,16 @@ namespace CaddyBrowseDeleter
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 dbContext.Database.Migrate();
             }
+
+            // 設定 Coravel 排程
+            var provider = app.Services;
+            provider.UseScheduler(scheduler =>
+            {
+                scheduler.Schedule<DeleteFilesJob>() // 每分鐘執行
+                    .EveryMinute().RunOnceAtStart();
+                    // .DailyAtHour(3).RunOnceAtStart(); // 每日半夜三點執行
+
+            });
 
             // Configure the HTTP request pipeline.
             // if (app.Environment.IsDevelopment())
