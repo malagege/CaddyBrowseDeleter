@@ -2,6 +2,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,7 +16,13 @@ public class AppDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite("Data Source=app.db");
+        var dbDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "db");
+        if (!Directory.Exists(dbDirectory))
+        {
+            Directory.CreateDirectory(dbDirectory);
+        }
+
+        optionsBuilder.UseSqlite($"Data Source={Path.Combine(dbDirectory, "app.db")}");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
