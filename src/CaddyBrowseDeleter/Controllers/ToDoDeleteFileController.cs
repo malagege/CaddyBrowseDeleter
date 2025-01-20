@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Data;
 using Microsoft.EntityFrameworkCore;
 using CaddyBrowseDeleter.ViewModel;
+using Coravel.Scheduling.Schedule.Interfaces;
 
 namespace CaddyBrowseDeleter.Controllers;
 
@@ -13,10 +14,13 @@ namespace CaddyBrowseDeleter.Controllers;
 public class ToDoDeleteFileController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly DeleteFilesJob _deleteFileJob;
 
-    public ToDoDeleteFileController(AppDbContext context)
+    public ToDoDeleteFileController(AppDbContext context, DeleteFilesJob deleteFileJob)
     {
         _context = context;
+        _deleteFileJob = deleteFileJob;
+
     }
 
     // GET: api/ToDoDeleteFile
@@ -45,8 +49,6 @@ public class ToDoDeleteFileController : ControllerBase
 
         return files;
     }
-
-
 
     // POST: api/ToDoDeleteFile
     [HttpPost]
@@ -91,5 +93,10 @@ public class ToDoDeleteFileController : ControllerBase
         return Ok();
     }
 
-
+    [HttpGet("execute")]
+    public async Task<IActionResult> RunDeleteFilesJob()
+    {
+        await _deleteFileJob.Invoke();
+        return Ok("排程已執行");
+    }
 }
