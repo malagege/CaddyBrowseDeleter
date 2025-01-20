@@ -1100,8 +1100,8 @@ footer {
         <label for="password">請輸入密碼:</label>
         <input type="password" id="password" name="password">
         <menu>
-            <button id="cancelButton">取消</button>
-            <button id="confirmButton">確認</button>
+			<button id="confirmButton">確認</button>
+			<button id="cancelButton">取消</button>
         </menu>
     </form>
 </dialog>  
@@ -1195,7 +1195,12 @@ footer {
 					data.forEach(file => {
 						const deleteButtons = document.querySelectorAll('.deleteBtn');
 						deleteButtons.forEach(button => {
+							// file.filePath 為 / 結尾為資料夾，取出路徑，把前面 / 拿掉
 							var filename = file.filePath.split('/').pop();
+							var filePath = file.filePath;
+							if (filePath[filePath.length - 1] === '/') {
+								filename = filePath.substring(1);
+							}
 							if (button.dataset.filename === filename) {
 
 
@@ -1278,12 +1283,21 @@ footer {
 						userName: userName
 					})
 				})
-				.then(response => response.json())
+				.then(response => {
+					if (!response.ok) {
+						throw new Error('網路回應非 200 狀態碼');
+					}
+					return response;
+				})
 				.then(data => {
 					console.log('成功:', data);
 				})
 				.catch((error) => {
 					console.error('錯誤:', error);
+					alert('錯誤: ' + error);
+				})
+				.finally(() => {
+					window.location.reload();
 				});
 			}
 		</script>
