@@ -1169,6 +1169,7 @@ footer {
 			document.querySelectorAll('.deleteBtn').forEach(function(el) {
 				el.addEventListener('click', function() {
 					const filename = el.getAttribute('data-filename');
+					autoEnterPassword();
 					openDialog(filename);
 				});
 			});
@@ -1178,9 +1179,11 @@ footer {
 				if( passwordPromptDialog.returnValue) {
 					const password = passwordPromptDialog.returnValue;
 					const filePath = document.getElementById('filePath').textContent;
+					localStorage.setItem('savedPassword', password); // 記錄密碼到 localStorage
 					sendPassword(filePath, password);
 				}
 			});
+
 
 			document.addEventListener('DOMContentLoaded', function() {
 				const currentPath = encodeURIComponent(window.location.pathname);
@@ -1299,6 +1302,12 @@ footer {
 				.finally(() => {
 					window.location.reload();
 				});
+			}
+			function autoEnterPassword() {
+				const savedPassword = localStorage.getItem('savedPassword');
+				if (savedPassword) {
+					document.getElementById('password').value = savedPassword;
+				}
 			}
 		</script>
 	</body>
