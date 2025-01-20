@@ -1,0 +1,19 @@
+FROM taphome/dotnet-armv6:v8.0.0 AS base
+WORKDIR /app
+EXPOSE 8080
+
+FROM taphome/dotnet-armv6:v8.0.0 AS build
+WORKDIR /src
+COPY ["CaddyBrowseDeleter.csproj", "./"]
+RUN dotnet restore "./CaddyBrowseDeleter.csproj"
+COPY . .
+WORKDIR "/src/."
+RUN dotnet build "CaddyBrowseDeleter.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "CaddyBrowseDeleter.csproj" -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "CaddyBrowseDeleter.dll"]
