@@ -114,5 +114,19 @@ def delete_files_job():
 
 scheduler.add_job(id='delete_files_job', func=delete_files_job, trigger='cron', hour=3)
 
+def insert_default_users():
+    logger.info('Inserting default users')
+    if not User.query.filter_by(name='malagege').first():
+        user1 = User(name='malagege')
+        db.session.add(user1)
+    if not User.query.filter_by(name='chevy').first():
+        user2 = User(name='chevy')
+        db.session.add(user2)
+    db.session.commit()
+
+@app.before_first_request
+def before_first_request():
+    insert_default_users()
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
