@@ -93,7 +93,9 @@ def delete_files_job():
     all_users = User.query.all()
     all_users_id = [user.id for user in all_users]
     files_to_delete = ToDoDeleteFile.query.options(db.joinedload(ToDoDeleteFile.users)).all()
-    files_to_delete = [file for file in files_to_delete if all(user.id in all_users_id for user in file.users)]
+    # 確認所有使用者都在 all_users_id 中
+    files_to_delete = [file for file in files_to_delete if all(user.id in all_users_id for user in file.users) and len(file.users) == len(all_users_id)]
+
     prefix_path = './extHDD'
     for file in files_to_delete:
         # file_path = os.path.join(prefix_path, file.file_path)
