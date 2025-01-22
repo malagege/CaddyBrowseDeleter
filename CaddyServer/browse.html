@@ -1186,7 +1186,8 @@ footer {
 
 
 			document.addEventListener('DOMContentLoaded', function() {
-				const currentPath = encodeURIComponent(window.location.pathname);
+				const currentPath = decodeURIComponent(window.location.pathname);
+				console.log("當前參照路徑 URL: " + currentPath);
 				fetch(`/api/ToDoDeleteFile?path=${currentPath}`, {
 					method: 'GET',
 					headers: {
@@ -1255,7 +1256,7 @@ footer {
 			timeList.forEach(localizeDatetime);
 
 			function openDialog(filename) {
-				const currentPath = window.location.pathname;
+				const currentPath = decodeURIComponent(window.location.pathname);
 				console.log("檔案參照路徑: " + filename);
 				console.log("當前參照路徑 URL: " + currentPath);
 				document.getElementById('filePath').textContent = currentPath + filename;
