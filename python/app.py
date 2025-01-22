@@ -40,7 +40,7 @@ class ToDoDeleteFile(db.Model):
         return {
             'filePath': self.file_path,
             'dirPath': self.dir_path,
-            'users': [user.name for user in self.users],
+            'users': [{'name': user.name} for user in self.users],
             'isReadyToDelete': self.is_ready_to_delete
         }
 
