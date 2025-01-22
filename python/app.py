@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from flask_apscheduler import APScheduler
 import os
 import logging
+import shutil
 
 # app = Flask(__name__)
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/app.db'
@@ -107,7 +108,7 @@ def delete_files_job():
         logger.info(f'Deleting: {file.file_path}')
         if os.path.isdir(file_path):
             logger.info(f'Deleting directory: {file.file_path}')
-            os.rmdir(file_path)
+            shutil.rmtree(file_path)
         else:
             logger.info(f'Deleting file: {file.file_path}')
             os.remove(file_path)
