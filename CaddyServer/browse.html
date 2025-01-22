@@ -1203,7 +1203,8 @@ footer {
 							var filename = file.filePath.split('/').pop();
 							var filePath = file.filePath;
 							if (filePath[filePath.length - 1] === '/') {
-								filename = filePath.substring(1);
+								var parts = filePath.split('/');
+								filename = parts[parts.length - 2] + '/';
 							}
 							if (button.dataset.filename === filename) {
 
