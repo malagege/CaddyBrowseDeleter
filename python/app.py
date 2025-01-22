@@ -57,11 +57,11 @@ def get_to_do_delete_files():
         filtered_files = files_query.filter(ToDoDeleteFile.file_path.like(f'{path}%')).all()
         for file in filtered_files:
             file.is_ready_to_delete = all(user in file.users for user in all_users)
-        return jsonify([file.to_dict() for file in filtered_files])
+        return json.dumps([file.to_dict() for file in filtered_files], ensure_ascii=False)
     files = files_query.all()
     for file in files:
         file.is_ready_to_delete = all(user in file.users for user in all_users)
-    return jsonify([file.to_dict() for file in files])
+    return json.dumps([file.to_dict() for file in files], ensure_ascii=False)
 
 @app.route('/api/ToDoDeleteFile', methods=['POST'])
 def post_to_do_delete_file():
