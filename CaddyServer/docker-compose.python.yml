@@ -1,0 +1,23 @@
+version: '3'
+services:
+  caddy:
+    image: caddy #arm32v6/caddy
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8080:80"
+    volumes:
+      - ./extHDD/:/srv
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./browse.html:/etc/caddy/browse.html
+  caddybrowsedeleter_python:
+    build:
+      context: ../python
+      dockerfile: Dockerfile
+    ports:
+      - "5050:5000"
+    volumes:
+      - ./extHDD:/app/extHDD
+      - ./db:/app/db
+    restart: unless-stopped
