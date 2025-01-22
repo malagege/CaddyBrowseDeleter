@@ -36,9 +36,10 @@ class ToDoDeleteFile(db.Model):
     users = db.relationship('User', secondary='to_do_delete_file_user', back_populates='to_do_delete_files')
     def to_dict(self):
         return {
-            'file_path': self.file_path,
-            'dir_path': self.dir_path,
-            'users': [user.name for user in self.users]
+            'filePath': self.file_path,
+            'dirPath': self.dir_path,
+            'users': [user.name for user in self.users],
+            'isReadyToDelete': self.is_ready_to_delete
         }
 
 class ToDoDeleteFileUser(db.Model):
@@ -95,7 +96,8 @@ def delete_files_job():
     files_to_delete = [file for file in files_to_delete if all(user.id in all_users_id for user in file.users)]
     prefix_path = './extHDD'
     for file in files_to_delete:
-        file_path = os.path.join(prefix_path, file.file_path)
+        # file_path = os.path.join(prefix_path, file.file_path)
+        file_path = prefix_path + file.file_path
         if not os.path.exists(file_path):
             db.session.delete(file)
             logger.warning(f'File not found: {file.file_path}')
