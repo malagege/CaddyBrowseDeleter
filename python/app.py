@@ -116,7 +116,7 @@ def delete_files_job():
         db.session.delete(file)
     db.session.commit()
 
-scheduler.add_job(id='delete_files_job', func=delete_files_job, trigger='cron', hour=3)
+scheduler.add_job(id='delete_files_job', func=delete_files_job, trigger='cron', hour=19)
 
 def insert_default_users():
     logger.info('Inserting default users')
