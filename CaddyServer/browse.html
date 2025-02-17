@@ -648,6 +648,11 @@ footer {
 	margin: 0 auto;
 }
 
+button.deleteBtn::after{
+	content: attr(title);
+	color: gray;
+}
+
 @media (max-width: 600px) {
 	.hideable {
 		display: none;
